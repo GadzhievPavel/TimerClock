@@ -6,7 +6,7 @@
     android:layout_height="match_parent">
 
    <LinearLayout
-       android:layout_alignParentBottom="true"
+       android:layout_centerInParent="true"
        android:layout_width="wrap_content"
        android:layout_height="wrap_content"
        android:orientation="vertical">
@@ -27,6 +27,24 @@
            android:textSize="30dp"
            android:textAlignment="center"
            android:text="Авторизоваться"
+           tools:ignore="RtlCompat" />
+       <EditText
+           android:id="@+id/editCode"
+           android:layout_width="match_parent"
+           android:layout_height="wrap_content"
+           android:lines="1"
+           android:textSize="24dp"
+           android:textAlignment="center"
+           android:hint="код"/>
+
+       <Button
+           android:id="@+id/buttonSignIn"
+           android:layout_width="match_parent"
+           android:layout_height="wrap_content"
+           android:gravity="bottom"
+           android:textSize="30dp"
+           android:textAlignment="center"
+           android:text="Войти"
            tools:ignore="RtlCompat" />
    </LinearLayout>
 </RelativeLayout>

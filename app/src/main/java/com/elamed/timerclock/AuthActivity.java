@@ -1,20 +1,15 @@
 package com.elamed.timerclock;
 
+import android.content.Intent;
 import android.os.Bundle;
-import android.os.PersistableBundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.FirebaseException;
-import com.google.firebase.FirebaseTooManyRequestsException;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
@@ -27,68 +22,132 @@ import java.util.concurrent.TimeUnit;
 public class AuthActivity extends AppCompatActivity {
 
     private static final String TAG ="Auth" ;
-    FirebaseAuth auth;
-    PhoneAuthProvider.ForceResendingToken mResendToken;
-    PhoneAuthProvider.OnVerificationStateChangedCallbacks callbacks;
-    EditText editText;
-    Button button;
-    private boolean verificationInProgress = false;
+    private EditText phoneNumberEditText;
+    private EditText verificationCodeEditText;
+    private Button enterCodeButton;
+    private Button getVerificationCodeButton;
+    private FirebaseAuth mAuth;
+    private String codeSent;
 
     @Override
-    public void onCreate(@Nullable Bundle savedInstanceState, @Nullable PersistableBundle persistentState) {
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
         setContentView(R.layout.auth_activity);
-        editText = findViewById(R.id.edit);
-        button = findViewById(R.id.button);
-        callbacks = new PhoneAuthProvider.OnVerificationStateChangedCallbacks() {
-            @Override
-            public void onVerificationCompleted(PhoneAuthCredential phoneAuthCredential) {
-                signInWithPhoneAuthCredential(phoneAuthCredential);
-            }
+        mAuth = FirebaseAuth.getInstance();
+        bindView();
+        setListeners();
+    }
 
-            @Override
-            public void onVerificationFailed(FirebaseException e) {
-                if(e instanceof FirebaseAuthInvalidCredentialsException){
-                    Log.e(TAG,"Invalid phone number");
+    private void bindView() {
+        phoneNumberEditText = findViewById(R.id.edit);
+        verificationCodeEditText = findViewById(R.id.editCode);
+        enterCodeButton = findViewById(R.id.buttonSignIn);
+        getVerificationCodeButton = findViewById(R.id.button);
+    }
 
-                }else if( e instanceof FirebaseTooManyRequestsException){
-                    Log.e(TAG,"Quota exceeded");
-                }
-            }
-        };
-        button.setOnClickListener(new View.OnClickListener() {
+    private void setListeners() {
+        enterCodeButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startPhoneNumberWithCode(editText.getText().toString());
+                String verificationCode = verificationCodeEditText.getText().toString();
+                verifySignInCode(verificationCode);
             }
         });
-    }
-
-    private void signInWithPhoneAuthCredential(PhoneAuthCredential phoneAuthCredential) {
-        auth.signInWithCredential(phoneAuthCredential).addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+        getVerificationCodeButton.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onComplete(@NonNull Task<AuthResult> task) {
-                if(task.isSuccessful()){
-                    Log.d(TAG,"signInWithCredential:success");
-                    FirebaseUser user = task.getResult().getUser();
-                }else{
-                    Log.w(TAG,"signInWithCredential:success",task.getException());
-                }
+            public void onClick(View v) {
+                String phoneNumber = phoneNumberEditText.getText().toString();
+                sendVerificationCode(phoneNumber);
             }
         });
     }
 
-    private void startPhoneNumberWithCode (String phoneNumber){
-        PhoneAuthProvider.getInstance().verifyPhoneNumber(phoneNumber,60, TimeUnit.SECONDS,this,callbacks);
-        verificationInProgress = true;
+    private void verifySignInCode(String verificationCode) {
+        PhoneAuthCredential credential = null;
+        try {
+            credential = PhoneAuthProvider.getCredential(codeSent, verificationCode);
+            signInWithPhoneAuthCredential(credential);
+        } catch (IllegalArgumentException e) {
+            verificationCodeEditText.setError("Invalid code");
+            phoneNumberEditText.requestFocus();
+        }
+
     }
 
-    private void verifyPhoneNumberVerification(String verificationId, String code){
-        PhoneAuthCredential credential = PhoneAuthProvider.getCredential(verificationId,code);
-        signInWithPhoneAuthCredential(credential);
+    private void sendVerificationCode(String phoneNumber) {
+
+        if (phoneNumber.isEmpty()) {
+            phoneNumberEditText.setError("Phone number is required");
+            phoneNumberEditText.requestFocus();
+            return;
+        }
+
+        if (phoneNumber.length() < 10) {
+            phoneNumberEditText.setError("Please enter a valid phone");
+            phoneNumberEditText.requestFocus();
+            return;
+        }
+
+        PhoneAuthProvider.getInstance().verifyPhoneNumber(
+                phoneNumber,
+                60,
+                TimeUnit.SECONDS,
+                this,
+                mCallbacks);
+
     }
 
-    private void resendVerificationCode(String phoneNumber, PhoneAuthProvider.ForceResendingToken token){
-        PhoneAuthProvider.getInstance().verifyPhoneNumber(phoneNumber,60,TimeUnit.SECONDS,this,callbacks,token);
+
+    private void signInWithPhoneAuthCredential(PhoneAuthCredential credential) {
+        mAuth.signInWithCredential(credential)
+                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<AuthResult> task) {
+                        if (task.isSuccessful()) {
+
+                            final FirebaseUser user = task.getResult().getUser();
+
+                            updateUI(user);
+
+                        } else {
+
+                            if (task.getException() instanceof FirebaseAuthInvalidCredentialsException) {
+
+                            }
+                        }
+                    }
+                });
     }
 
+
+    private void updateUI(FirebaseUser user) {
+        if (user != null) {
+            Intent intent = new Intent(this, MainActivity.class);
+            startActivity(intent);
+            finish();
+        }
+
+    }
+
+    PhoneAuthProvider.OnVerificationStateChangedCallbacks mCallbacks = new PhoneAuthProvider.OnVerificationStateChangedCallbacks() {
+        @Override
+        public void onVerificationCompleted(PhoneAuthCredential phoneAuthCredential) {
+
+        }
+
+        @Override
+        public void onVerificationFailed(FirebaseException e) {
+
+        }
+
+        @Override
+        public void onCodeSent(String s, PhoneAuthProvider.ForceResendingToken forceResendingToken) {
+            super.onCodeSent(s, forceResendingToken);
+            codeSent = s;
+        }
+    };
 }
+
+
+
+
