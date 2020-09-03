@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "415549537234",
+    "firebase_url": "https://timerclock-55173.firebaseio.com",
+    "project_id": "timerclock-55173",
+    "storage_bucket": "timerclock-55173.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:415549537234:android:d7b95755cdc3c7968f260b",
+        "android_client_info": {
+          "package_name": "com.elamed.timerclock"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "415549537234-k0gp92lgn6lvumng6lmbjf5tqj3ia75h.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.elamed.timerclock",
+            "certificate_hash": "d2cd80e9410bc4612fef2d89baf0705404e2a63f"
+          }
+        },
+        {
+          "client_id": "415549537234-fagcch35p1alu7dfvbn8cld10abrrif6.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC-r4uxEFEzg2N43KFCFketw2Yao4j-GFY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "415549537234-fagcch35p1alu7dfvbn8cld10abrrif6.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

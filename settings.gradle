@@ -1,0 +1,2 @@
+rootProject.name='TimerClock'
+include ':app'
