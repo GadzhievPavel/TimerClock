@@ -17,6 +17,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -80,7 +81,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 Toast.makeText(this, date.toString(), Toast.LENGTH_SHORT).show();
                 queryDB.insertTime(date.getTime());
                 times.add(date.getTime());
-                startService(new Intent(getApplicationContext(),MyService.class));
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    startForegroundService(new Intent(getApplicationContext(),MyService.class));
+                }
                 for (Long time : times){
                     if(time > System.currentTimeMillis()){
                         OneTimeWorkRequest oneTimeWorkRequest = new OneTimeWorkRequest.Builder(WorkerClass.class).

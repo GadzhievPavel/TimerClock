@@ -14,22 +14,21 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".AuthActivity">
+        <activity android:name=".AuthActivity"/>
+        <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".MainActivity"/>
         <activity android:name=".AlarmNotification"/>
         <receiver android:name=".RebootReceiver">
             <intent-filter>
-<!--                <action android:name="android.intent.action.ACTION_POWER_DISCONNECTED"/>-->
-<!--                <action android:name="android.intent.action.ACTION_POWER_CONNECTED"/>-->
-                <action android:name="android.intent.action.TIME_TICK"/>
+                <action android:name="android.intent.action.REBOOT"/>
+                <action android:name="android.intent.action.BOOT_COMPLETED"/>
             </intent-filter>
         </receiver>
-        <service android:name=".MyService"/>
+        <service android:name=".MyService" />
     </application>
 
 </manifest>
