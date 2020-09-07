@@ -82,14 +82,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 queryDB.insertTime(date.getTime());
                 times.add(date.getTime());
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    startForegroundService(new Intent(getApplicationContext(),MyService.class));
-                }
-                for (Long time : times){
-                    if(time > System.currentTimeMillis()){
-                        OneTimeWorkRequest oneTimeWorkRequest = new OneTimeWorkRequest.Builder(WorkerClass.class).
-                                setInitialDelay(time-System.currentTimeMillis(), TimeUnit.MILLISECONDS).build();
-                        WorkManager.getInstance().enqueue(oneTimeWorkRequest);
-                    }
+                    startService(new Intent(getApplicationContext(),MyService.class));
                 }
                 break;
         }
